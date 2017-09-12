@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cjl-rbd
+parameters:
+  adminId: kube
+  adminSecretName: ceph-secret
+  monitors: 172.22.31.250:6789,172.22.31.251:6789,172.22.31.252:6789
+  pool: kube
+  userId: kube
+  userSecretName: ceph-secret
+  adminSecretNamespace: cjl
+provisioner: kubernetes.io/rbd

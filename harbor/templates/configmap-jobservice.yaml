@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "name" . }}-jobservice
+  labels:
+    app: {{ template "name" . }}-jobservice
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  MYSQL_HOST: {{ template "fullname" . }}-mysql
+  MYSQL_PORT: "3306"
+  MYSQL_USR: root
+  MYSQL_PWD: {{ default "root123" .Values.mysql.rootPassword | quote }}
+  UI_SECRET: "MY9lNdVv9OWaIGfk"
+  SECRET_KEY: "1s68Gi4GT5iak3Ms"
+  CONFIG_PATH: /etc/jobservice/app.conf
+  REGISTRY_URL: http://{{ template "fullname" . }}-registry:5000
+  VERIFY_REMOTE_CERT: "off"
+  MAX_JOB_WORKERS: "3"
+  LOG_LEVEL: debug
+  LOG_DIR: /var/log/jobs
+  GODEBUG: netdns=cgo
+  {{- if eq .Values.service.type "NodePort" }}
+  EXT_ENDPOINT: http://{{ .Values.service.host }}:{{ .Values.service.externalPort }}
+  {{- else }}
+  EXT_ENDPOINT: http://{{ .Values.service.host }}
+  {{- end }}
+  TOKEN_URL: http://{{ template "fullname" . }}-ui
+  config: |
+    appname = {{ template "fullname" . }}-jobservice
+    runmode = dev
+    [dev]
+    httpport = 80

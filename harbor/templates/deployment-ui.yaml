@@ -1,0 +1,178 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}-ui
+  labels:
+    app: {{ template "name" . }}-ui
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.ui.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}-ui
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: ui-app
+        image: {{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag}}
+        imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
+        env:
+          - name: MYSQL_HOST
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: MYSQL_HOST
+          - name: MYSQL_PORT
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: MYSQL_PORT
+          - name: MYSQL_USR
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: MYSQL_USR
+          - name: MYSQL_PWD
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: MYSQL_PWD
+          - name: REGISTRY_URL
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: REGISTRY_URL
+          - name: CONFIG_PATH
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: CONFIG_PATH
+          - name: HARBOR_REG_URL
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: HARBOR_REG_URL
+          - name: HARBOR_ADMIN_PASSWORD
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: HARBOR_ADMIN_PASSWORD
+          - name: HARBOR_URL
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: HARBOR_URL
+          - name: AUTH_MODE
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: AUTH_MODE
+          - name: LDAP_URL
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_URL 
+          - name: LDAP_SEARCH_DN
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_SEARCH_DN 
+          - name: LDAP_SEARCH_PWD
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_SEARCH_PWD 
+          - name: LDAP_BASE_DN
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_BASE_DN 
+          - name: LDAP_FILTER
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_FILTER 
+          - name: LDAP_UID
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_UID 
+          - name: LDAP_SCOPE
+            valueFrom:
+              configMapKeyRef:
+                name: {{ template "name" . }}-ui
+                key: LDAP_SCOPE 
+          - name: LOG_LEVEL
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: LOG_LEVEL
+          - name: UI_SECRET
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: UI_SECRET
+          - name: SECRET_KEY
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: SECRET_KEY
+          - name: GODEBUG
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: GODEBUG
+          - name: EXT_ENDPOINT
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: EXT_ENDPOINT
+          - name: TOKEN_URL
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: TOKEN_URL
+          - name: SELF_REGISTRATION
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: SELF_REGISTRATION
+          - name: USE_COMPRESSED_JS
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: USE_COMPRESSED_JS
+          - name: VERIFY_REMOTE_CERT
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: VERIFY_REMOTE_CERT
+          - name: TOKEN_EXPIRATION
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: TOKEN_EXPIRATION
+          - name: EXT_REG_URL
+            valueFrom: 
+              configMapKeyRef: 
+                name: {{ template "name" . }}-ui
+                key: EXT_REG_URL
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config
+          mountPath: /etc/ui
+        resources:
+{{ toYaml .Values.ui.resources | indent 10 }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "name" . }}-ui
+          items:
+          - key: config
+            path: app.conf
+          - key: pkey
+            path: private_key.pem

@@ -1,2 +1,2 @@
 # helm-harbor
-use helm create harbor on kubernetes
+use helm create harbor on Kubernetes
